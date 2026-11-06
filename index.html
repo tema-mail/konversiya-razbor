@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Конверсия сайтов и A/B-тесты: разбор 9 роликов</title>
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--ink:#1d1c1a;--mute:#66635c;--line:#dfdcd3;--acc:#0e6655;--acc-soft:#e2f0ec;--warn:#9a5b00;--warn-soft:#fbf0dc;--bad:#a33a2a;--bad-soft:#f9e6e2}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+a{color:var(--acc)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+header.wrap{padding:32px 20px 20px}
+.kicker{margin:0 0 6px;font-size:14px;color:var(--mute)}
+h1{margin:0 0 18px;font-size:clamp(27px,4.4vw,40px);line-height:1.12;letter-spacing:-.015em;text-wrap:balance}
+.voice{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:var(--ink);color:#fff;border-radius:14px;padding:14px 18px}
+.voice b{display:block;font-size:17px}
+.voice span{font-size:14px;opacity:.75}
+.voice audio{flex:1 1 300px;min-width:0;width:100%;height:44px}
+nav{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding:8px 0}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:none;min-height:44px;padding:8px 14px;border:0;border-radius:9px;background:none;color:var(--mute);font:inherit;font-size:16px;font-weight:600;cursor:pointer}
+.tabs button:hover{background:#ebe9e2;color:var(--ink)}
+.tabs button[aria-selected=true]{background:var(--acc);color:#fff}
+button:focus-visible,a:focus-visible{outline:3px solid #e39b2d;outline-offset:2px}
+main.wrap{padding:32px 20px 72px}
+section[hidden]{display:none}
+h2{margin:0 0 8px;font-size:clamp(23px,3vw,30px);line-height:1.2;letter-spacing:-.01em}
+h3{margin:36px 0 12px;font-size:20px;line-height:1.3}
+.lead{margin:0 0 22px;max-width:760px;font-size:18px;color:#3f3d38}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(270px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.card h3{margin:0 0 6px;font-size:18px}
+.card p{margin:0}
+.card.acc{background:var(--acc-soft);border-color:#b9dcd3}
+.card.warn{background:var(--warn-soft);border-color:#ecd5a8}
+.num{display:block;font-size:34px;line-height:1.1;font-weight:700;letter-spacing:-.02em;margin-bottom:6px;color:var(--acc)}
+ol.q{margin:0;padding:0;list-style:none;counter-reset:q}
+ol.q li{counter-increment:q;position:relative;padding:12px 0 12px 42px;border-top:1px solid var(--line)}
+ol.q li:first-child{border-top:0}
+ol.q li::before{content:counter(q);position:absolute;left:0;top:11px;width:29px;height:29px;border-radius:50%;background:var(--acc);color:#fff;font-size:15px;font-weight:700;display:grid;place-items:center}
+.flow{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 24px;padding:0;list-style:none}
+.flow li{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:15px;font-weight:600}
+.flow li:not(:last-child)::after{content:"→";margin-left:10px;color:var(--mute);font-weight:400}
+.formula{display:grid;gap:10px;grid-template-columns:repeat(3,1fr);margin-bottom:10px}
+.formula div{background:var(--acc-soft);border-radius:12px;padding:14px;font-weight:600;text-align:center}
+.tw{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:16px}
+th{padding:11px 14px;text-align:left;font-size:13px;font-weight:600;color:var(--mute);background:#faf9f6;border-bottom:1px solid var(--line)}
+td{padding:12px 14px;vertical-align:top;border-top:1px solid var(--line)}
+tr:first-child td{border-top:0}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.first{font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px}
+.chips button{min-height:44px;padding:6px 13px;border:1px solid var(--line);border-radius:22px;background:var(--card);color:var(--ink);font:inherit;font-size:15px;cursor:pointer}
+.chips button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+.chips small{opacity:.65;font-size:13px;margin-left:3px}
+.tag{display:inline-block;padding:2px 9px;border-radius:7px;font-size:14px;font-weight:600;white-space:nowrap}
+.y{background:var(--acc-soft);color:var(--acc)}.m{background:var(--warn-soft);color:var(--warn)}.x{background:var(--bad-soft);color:var(--bad)}
+ul.plain{margin:0;padding-left:20px}ul.plain li{margin:5px 0}
+.note{font-size:15px;color:var(--mute);margin:10px 0 0}
+@media(max-width:700px){
+body{font-size:16px}
+header.wrap{padding-top:22px}
+.formula{grid-template-columns:1fr}
+.tw{background:none;border:0;border-radius:0;overflow:visible}
+table.r thead{display:none}
+table.r,table.r tbody,table.r tr,table.r td{display:block;width:100%}
+table.r tr{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 0;margin-bottom:10px}
+table.r td{border:0;padding:5px 15px;text-align:left;white-space:normal}
+table.r td::before{content:attr(data-l);display:block;font-size:12px;color:var(--mute)}
+table.r td.first::before{display:none}
+table.r td.first{font-size:16.5px}
+}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <p class="kicker">Разбор от 6 ноября 2026 · 9 роликов и исследование A/B-тестов</p>
+  <h1>Как поднять конверсию сайта и что из этого брать к нам</h1>
+  <div class="voice">
+    <div><b>Послушать итог голосом</b><span>Главное за полторы минуты</span></div>
+    <audio controls preload="none" src="itog.mp3"></audio>
+  </div>
+</header>
+<nav><div class="wrap"><div class="tabs" role="tablist" id="tabs"></div></div></nav>
+<main class="wrap" id="main"></main>
+
+<script>
+const T=(cols,rows,opt={})=>{
+  const num=opt.num||[];
+  return `<div class="tw"><table class="r"><thead><tr>${cols.map((c,i)=>`<th${num.includes(i)?' class="n"':''}>${c}</th>`).join('')}</tr></thead><tbody>${
+    rows.map(r=>`<tr>${r.map((c,i)=>`<td data-l="${cols[i]}" class="${i===0?'first':''}${num.includes(i)?' n':''}">${c}</td>`).join('')}</tr>`).join('')
+  }</tbody></table></div>`};
+const ok='<span class="tag y">Да</span>',later='<span class="tag m">Позже</span>',no='<span class="tag x">Нет</span>';
+const L=(u,t)=>`<a href="${u}" target="_blank" rel="noopener">${t}</a>`;
+
+const fishki=[
+['Заголовок','Сразу показывает ценность, простым языком, про один продукт. Подзаголовок не повторяет заголовок.','Лебедев'],
+['Заголовок','Названия блоков несут смысл: «Установили 1 400 дверей» вместо «Наши проекты».','Евстигнеев, Shuttle'],
+['Заголовок','Дескриптор у логотипа помогает и человеку, и автотаргетингу Директа.','Евстигнеев'],
+['Заголовок','До 6 слов, числа и негатив, одно усиливающее слово.','Ксения Шу'],
+['Первый экран','Три ответа: что продаёте, в чём суть, почему остаться.','Евстигнеев'],
+['Первый экран','Фактор доверия вверху: логотипы или плашка Яндекса. Без стоковых фото.','Лебедев'],
+['Кнопка','Описывает действие и результат. Прямота зависит от прогретости человека.','Лебедев, Евстигнеев'],
+['Кнопка','Лёгкий шаг работает лучше: в недвижимости «подобрать» обошло «показ» и «купить».','Tilda'],
+['Кнопка','Закреплённая на телефоне: написать и позвонить.','Евстигнеев, Tilda'],
+['Кнопка','Повтор 3–4 раза на длинной странице: после выгод, кейсов, отзывов.','Евстигнеев, Ксения Шу'],
+['Форма','Минимум полей. Иногда достаточно спросить, куда отправить результат.','Евстигнеев, Tilda'],
+['Форма','Радиокнопки вместо выпадающего списка.','Tilda'],
+['Форма','Подпись «что будет после заявки», срок ответа и буллеты, что человек получит.','Евстигнеев, Tilda'],
+['Форма','Форма в момент интереса: после кейса, внутри галереи, внутри статьи.','Евстигнеев'],
+['Форма','Страница «спасибо» удерживает: срочный телефон, работы, видео.','Евстигнеев'],
+['Квиз','3–5 вопросов, понятный результат, первый вопрос с картинками.','Евстигнеев, Tilda'],
+['Квиз','Инструмент сегментации, а не ради квиза. Учит Директ искать похожих.','Ксения Шу, Евстигнеев'],
+['Доверие','Кейс «было – сделали – стало», в заголовке кейса цифра.','Евстигнеев, Shuttle'],
+['Доверие','Отзывы со смысловым заголовком, городом и задачей: видео, письма, скрины карт.','Евстигнеев, Sales Engineers'],
+['Доверие','Живое фото с именем у формы. Настоящее среднего качества лучше стока.','Евстигнеев, Tilda'],
+['Доверие','Этапы работ снимают барьер неизвестности. Гарантии конкретными формулировками.','Sales Engineers, Евстигнеев'],
+['Магазин','Горизонтальный каталог при ассортименте до 20 позиций.','ecomlena'],
+['Магазин','Покупка из каталога без захода в карточку.','ecomlena, Sales Engineers'],
+['Магазин','Допродажи 3–4 раза на пути, включая сценарий «шаг 1, 2, 3».','ecomlena'],
+['Магазин','Допродажа перед оплатой: дешевле основного товара на 50% и больше.','Ксения Шу'],
+['Магазин','UGC-видео в карточке, ритм «картинка – короткий текст».','ecomlena'],
+['Магазин','Быстрая оплата, рассрочка, вход по телефону и SMS.','ecomlena, Sales Engineers'],
+['Магазин','Нет в наличии: страницу не удалять, показать похожие.','Sales Engineers'],
+['Магазин','Сравнение, рейтинг, подтверждение оригинальности, условия гарантии.','Sales Engineers'],
+['Измерение','Пять конверсий: общая, в открытие, по формам, поэтапная, по полям и шагам.','Tilda'],
+['Измерение','Заявки не равны квалифицированным лидам: проверять по BANT.','Sales Engineers'],
+['Измерение','До старта договориться о KPI и зоне влияния, через 3 месяца сделать аудит.','Tilda'],
+['Измерение','Кто на сайте больше 5 минут – короткий опрос: чего не хватило.','Ксения Шу'],
+['Измерение','Проверять заголовок и картинку под ним. Какой тест по силам, смотри вкладку A/B.','Макс Маркетинг, Евстигнеев, Лебедев'],
+];
+
+const pages=[
+{id:'itog',name:'Итог',html:`
+<h2>Коротко</h2>
+<p class="lead">Изучил все 9 роликов и отдельно A/B-тесты. В скиллы пока ничего не вносил, ждёт твоего решения.</p>
+<div class="grid">
+  <div class="card acc"><h3>Сначала смыслы, потом дизайн</h3><p>Смысл сайта – это то, что важно клиенту, слабо раскрыто у конкурентов и компания реально может доказать.</p></div>
+  <div class="card acc"><h3>Структура из вопросов клиента</h3><p>Какой вопрос возник после этого экрана, на тот и отвечает следующий. Так блоки выстраиваются сами.</p></div>
+  <div class="card warn"><h3>A/B на малом трафике не работает</h3><p>При 500–2000 визитах в месяц тест на заявках занял бы от 2,5 месяца до 7 лет. В прототипе проверяем на людях.</p></div>
+</div>
+<h3>Что нужно от тебя</h3>
+<div class="card"><ol class="q">
+  <li><b>Вносим в скилл маркетолога?</b> Новые таблицы анализа, вопросы брифа и варианты блоков в прототипе.</li>
+  <li><b>На каком сайте пробуем сплит первым?</b> Предлагаю тот, где больше всего трафика. Цифры сниму через Метрику.</li>
+</ol></div>
+<h3>Что взял и что нет</h3>
+${T(['','Что','Почему'],[
+['Взял','Методику, приёмы, инструменты, цифры, ответы на вопросы в эфире','Это суть роликов'],
+['Вырезал','Рекламу аудитов и Telegram-каналов, просьбы подписаться, приветствия','Это продажа, а не знания'],
+['Не смог взять','Слайды и экраны, например таблицу KPI у Tilda и таблицу конкурентов у Евгении','Читал только субтитры, картинку не видел'],
+['Не скачивал','PDF и чек-листы авторов, стресс-тест Евгении из 10 экспериментов','Они лежат в Telegram-каналах'],
+])}
+<h3>Все ролики</h3>
+${T(['Автор','Ролик','Длина','Что дал'],[
+['Евгения',L('https://www.youtube.com/watch?v=Ifr7tuEtpwk','Как сделать продающий лендинг: от анализа ЦА и конкурентов до структуры'),'32:32','<b>Главный.</b> Вся цепочка от анализа до страницы на одном кейсе'],
+['Tilda, Артур Ткаченко',L('https://www.youtube.com/watch?v=bjfl_1xv4EM','Как повысить конверсию сайта: 20+ приёмов'),'1:01:07','Виды конверсии, KPI с клиентом, формы, ответы на вопросы'],
+['Евстигнеев',L('https://www.youtube.com/watch?v=_Hrh6aScSJk','50 фишек для конверсии для сайта'),'35:31','Формы, квизы, виджеты. Есть сомнительные приёмы'],
+['Sales Engineers',L('https://www.youtube.com/watch?v=vR2ZV3oQcEg','ХВАТИТ сливать бюджет! 40 рабочих методов поднять конверсию сайта в 2 раза уже сегодня'),'25:12','База для услуг и магазинов, BANT. Опыт спикера в SEO: 10 месяцев'],
+['Shuttle',L('https://www.youtube.com/watch?v=SenO-aDRCqE','Как увеличить конверсию сайта: бесплатный аудит, разбор'),'16:38','Разбор сайта по чек-листу. Ролик 2023 года'],
+['Ксения Шу',L('https://www.youtube.com/watch?v=6F0wV5IKurA','7+ приемов для лендингов, которые удвоят продажи'),'14:28','Квиз как сегментация, допродажа перед оплатой, опрос на сайте'],
+['ecomlena',L('https://www.youtube.com/watch?v=jEAAHsAjaz0','5 фишек миллиардного сайта, которые селлеры могут забрать себе'),'11:32','Магазин: разбор сайта Rhode на телефоне'],
+['Олег Лебедев',L('https://www.youtube.com/watch?v=rIZiLg8oujM','ИДЕАЛЬНЫЙ первый экран на сайте'),'5:43','Проверка первого экрана: заголовок, кнопка, доверие, фото'],
+['Макс Маркетинг',L('https://www.youtube.com/watch?v=hjPGpOoz-gs','как увеличить конверсию на сайте.'),'2:15','Только идея «один сплит-тест в неделю»'],
+],{num:[2]})}
+`},
+{id:'glavnyy',name:'Главный ролик',html:`
+<h2>Евгения: от анализа до структуры</h2>
+<p class="lead">Разбор на примере промышленной вентиляции. Метод не привязан к нише, но подтверждённых цифр конверсии в ролике нет.</p>
+<ul class="flow"><li>Исследование</li><li>Стратегия</li><li>Смыслы</li><li>Структура</li><li>Тексты</li><li>Дизайн</li></ul>
+<h3 style="margin-top:0">Формула смысла</h3>
+<div class="formula"><div>Важно клиенту</div><div>Слабо раскрыто рынком</div><div>Компания может доказать</div></div>
+<p class="note">Пример результата: «Не начинаем модернизацию с выбора нового оборудования».</p>
+<h3>17 приёмов</h3>
+${T(['Приём','Как работает','Пример'],[
+['1. Сегменты по ситуации, а не по должности','Важно, что случилось до поиска: тип производства, проблема, состояние системы','Два завода одной отрасли: новый цех и старая вентиляция не справляется'],
+['2. Второй экран «с какой задачей пришли»','Вместо «наши услуги» человек узнаёт свою ситуацию и идёт по своему сценарию','Новый цех, перестала справляться, без остановки, проект уже есть'],
+['3. Вопросы каждого, кто влияет на решение','Страница продаёт и техническую убедительность, и управленческую безопасность','Инженеру – параметры, директору – деньги и простой, закупщику – смета'],
+['4. Три уровня конкурентов','База у всех, планка сильных, вопросы без ответа','Пять вопросов, которые слабо раскрыты даже у сильных'],
+['5. Формула смысла','Пересечение трёх элементов выше','«Не начинаем модернизацию с выбора нового оборудования»'],
+['6. Позиционирование вытаскивают из бизнеса','Сверка с профилем компании: что реально делает и чем подтвердит','Кейс: сохранили 60% воздуховодов'],
+['7. Четыре роли аргумента','Гигиена, характеристика, доказательство, причина выбора','«10 лет» – для доверия, а не для отстройки'],
+['8. Факт превращаем в снижение риска','Характеристику связывают с ценностью для клиента','«Свой проектный отдел» → «проектировщик видит объект до чертежа»'],
+['9. Структура из цепочки вопросов','Какой вопрос возникнет после этого экрана, на тот отвечает следующий','«Работают с такими, как я?» → «Поймут мою ситуацию?»'],
+['10. Первый экран по слоям','Строка релевантности, заголовок-смысл, подзаголовок-страх, факты статуса, кнопка','Факты остаются, но подтверждают статус'],
+['11. Кнопка по стадии решения','Холодным – лёгкий шаг, горячим – отдельный путь','«Получить инженерную оценку» и «Отправить проект или планы»'],
+['12. Один вывод проходит через всю страницу','Определяет первый экран, сценарий, отдельный блок, кейс и кнопку','Страх полной замены прошёл через 6 мест'],
+['13. Доказательство рядом с обещанием','Отдельного блока внизу мало','«Проверяем параметры» → протокол замеров'],
+['14. Цена через то, от чего зависит','Не обещание низкой цены, а объяснение бюджета','«Нельзя рассчитать только по площади»'],
+['15. Обратная проверка фразы','За каждой фразой: страх, пробел рынка, возможность компании, доказательство','Семь разобранных фраз'],
+['16. Форма продолжает исследование','Просим то, что даст предметный ответ','План, проект, фото, описание задачи'],
+['17. ТЗ дизайнеру из смыслов','Что читать первым, где цифра, схема или документ','Инженер с прибором вместо абстрактного воздуховода'],
+])}
+`},
+{id:'fishki',name:'Фишки',html:`
+<h2>Фишки из остальных роликов</h2>
+<p class="lead">Это гипотезы, а не правила: просмотры у большинства роликов маленькие, доказательства приведены редко.</p>
+<div class="chips" id="chips"></div>
+<div id="fishki-list"></div>
+`},
+{id:'instrumenty',name:'Инструменты',html:`
+<h2>Инструменты из роликов</h2>
+<p class="lead">Всё, что авторы называли по делу. Сервисы тут не проверял и не сравнивал.</p>
+${T(['Инструмент','Для чего','Откуда'],[
+['Яндекс Метрика: Вебвизор, карта кликов','Что делают люди и где застревают','Tilda, Shuttle, Лебедев'],
+['Статистика Тильды, Google Analytics','Конверсии форм, просмотры товаров','Tilda'],
+['Google PageSpeed','Скорость: цель – не ниже жёлтой зоны','Tilda'],
+['Сервис сжатия с ползунком','Картинка примерно 50–400 КБ. Название сервиса не прозвучало','Tilda'],
+['Marquiz, блоки Тильды','Квизы без программиста','Ксения Шу, Tilda'],
+['Exit-popup, time-popup, виджет с живым фото','Поймать уходящего, дать выбор канала связи','Евстигнеев, Ксения Шу, Sales Engineers'],
+['Директ: автотаргетинг и оптимизация по квизу','Привести похожих на прошедших квиз','Евстигнеев'],
+['BANT','Квалификация лида: бюджет, полномочия, потребность, сроки','Sales Engineers'],
+['Jobs to be Done','Сегменты квиза по задаче человека','Ксения Шу'],
+['Сплит-тест','Два варианта на разные части аудитории','Макс Маркетинг'],
+['СБП, Яндекс Pay, Tinkoff Pay, СДЭК, Почта России','Оплата и доставка','ecomlena, Sales Engineers'],
+['CRM или Excel','Чтобы заявки не терялись','Tilda'],
+])}
+`},
+{id:'ostorozhno',name:'Не брать',html:`
+<h2>Что не брать без проверки</h2>
+<p class="lead">Цифры без источника и приёмы, которые противоречат нашим правилам.</p>
+${T(['Что сказали','Почему осторожно'],[
+['«Каждое поле минус 10%», «100 КБ минус 1,8%»','Источник не назван'],
+['«Жёлтые и зелёные кнопки лучше всех», «тень на кнопке поднимает конверсию в разы»','Доказательств нет'],
+['«Одно слово подняло конверсию на 6%», 52 теста в год','Данные теста не показаны, при малом трафике недостижимо'],
+['Рисовать обложку каталога: «неважно, есть ли он»','Обман, противоречит нашим правилам'],
+['Сдвигаемый дедлайн и таймер','У нас срочность только с настоящей причиной'],
+['Показ данных человека по IP, виджет «Я вас знаю»','Выглядит жутко, нужна юрпроверка'],
+['«Усложняйте покупку», «делайте вид, что квалифицируете»','Подходит только сильным брендам, нужен тест'],
+['Штраф 100–300 тыс. ₽ за галочку согласия','Сумма со слов спикера, не проверял'],
+['Rhode и «100 млн выручки»','Кейс мирового бренда, переносится ограниченно'],
+])}
+`},
+{id:'brif',name:'Анализ и бриф',html:`
+<h2>Как вставить в анализ и бриф</h2>
+<p class="lead">Базу маркетолога проверил только поиском по словам. Гигиена, свободный угол, ЛПР и ситуации там уже есть, план блоков строится через вопрос клиента. Цепочки «следующий вопрос» и BANT поиск не нашёл.</p>
+<h3 style="margin-top:0">В анализ: четыре таблицы</h3>
+${T(['Таблица','Колонки'],[
+['Ситуации','Ситуация / что случилось до поиска / что уже пробовал / главный вопрос'],
+['Роли','Кто влияет на решение / чего боится / какой аргумент нужен'],
+['Конкуренты','Вопрос клиента / что говорят все / что доказывают сильные / кто не отвечает'],
+['Смыслы','Страх / пробел рынка / возможность компании / доказательство / куда идёт на странице'],
+])}
+<h3>В бриф: новые вопросы клиенту</h3>
+<div class="card"><ol class="q">
+<li>С какими ситуациями к вам приходят? Что случилось перед обращением и что человек уже пробовал?</li>
+<li>Кто ещё участвует в решении и что спрашивает каждый?</li>
+<li>Что вы делаете не так, как другие? Покажите на конкретном объекте.</li>
+<li>Какими артефактами это подтвердить: протоколы, замеры, фото с объекта, документы?</li>
+<li>Какой первый шаг у того, кто ещё не знает, что ему нужно? А у того, у кого уже всё есть?</li>
+<li>От чего на самом деле зависит цена?</li>
+<li>Что считаем успехом сайта и какие показатели в нашей зоне влияния?</li>
+</ol></div>
+<h3>В прототип и проверку</h3>
+<div class="card"><ul class="plain">
+<li>У каждого блока подпись: на какой вопрос отвечает и какой вызывает дальше.</li>
+<li>У каждого обещания указано его доказательство.</li>
+<li>В первом экране проверяется роль каждого аргумента.</li>
+</ul></div>
+`},
+{id:'ab',name:'A/B-тесты',html:`
+<h2>A/B-тесты: что есть и как делать</h2>
+<p class="lead">Классический тест на заявках требует трафика, которого у большинства наших клиентов нет. Поэтому два режима.</p>
+<div class="grid">
+  <div class="card"><span class="num">до ~3000</span><h3>визитов страницы в месяц</h3><p>5 человек на юзабилити, выбор первого экрана, панель респондентов. В бою без сплита.</p></div>
+  <div class="card acc"><span class="num">от ~3000</span><h3>визитов или реклама</h3><p>Сплит, одна крупная гипотеза, срок и выборка заранее, результат не подсматривать.</p></div>
+</div>
+<h3>Сколько нужно трафика</h3>
+${T(['Конверсия сейчас, ждём рост','Всего визитов','Мес. при 500','Мес. при 2000','Мес. при 10 000'],[
+['2%, +20%','42 218','84,4','21,1','4,2'],
+['2%, +50%','7 652','15,3','3,8','0,8'],
+['3%, +20%','27 828','55,7','13,9','2,8'],
+['3%, +50%','5 036','10,1','2,5','0,5'],
+],{num:[1,2,3,4]})}
+<p class="note">Значимость 5%, мощность 80%, трафик делится поровну, считаются визиты самой страницы. Таблицу пересчитал сам, сошлась. Клики по кнопке считаются быстрее (3–4 недели при 2000 визитов), но рост кликов не доказывает рост заявок.</p>
+<h3>Инструменты</h3>
+${T(['Инструмент','Цена','Подходит?','Комментарий'],[
+[L('https://varioqub.ru/web','Varioqub')+' от Яндекса','Базовый бесплатно: 2 эксперимента',ok,'Для сайтов без доступа к серверу, если решён вопрос с согласием на cookie'],
+[L('https://yandex.ru/support/direct/ru/campaigns/experiments','Директ, эксперименты'),'Бюджет рекламы',ok,'Для платного трафика'],
+['Свой сплит: '+L('https://nginx.org/en/docs/http/ngx_http_split_clients_module.html','nginx')+' + две сборки Astro','0 ₽ + работа',ok,'<b>Лучший вариант для боя:</b> без мигания, адрес один'],
+[L('https://www.growthbook.io/pricing','GrowthBook')+' на своём сервере','Бесплатно',later,'Нужны Mongo и своё хранилище событий'],
+['PostHog, Statsig, Unleash, VWO, Optimizely','От 0 до сотен $ в месяц',no,'Зарубежное облако, дорого или мало функций'],
+['Google Optimize','–',no,L('https://posthog.com/blog/google-optimize-alternatives','Закрыт в 2023')],
+])}
+<p class="note">Инструменты и цены собрал агент по источникам, сам я их не открывал.</p>
+<h3>Что проверять на прототипе</h3>
+<p style="margin:0 0 12px">Это не A/B: реального трафика и покупки здесь нет.</p>
+${T(['Метод','Что даёт','Чего не даёт','Объём'],[
+['Юзабилити-тест',L('https://www.nngroup.com/articles/why-you-only-need-to-test-with-5-users/','Около 85% проблем')+', где люди путаются','Прогноз конверсии','5 человек'],
+['5-секундный тест','Понятно ли «что, где, для кого»','Желание купить','~20 ответов на вариант'],
+['Выбор первого экрана','Какой оффер убедительнее на словах','Реальное поведение','Перевес значим при 15 из 20 или 33 из 50'],
+['Реклама на 2 варианта','Настоящие клики и заявки','Прогноз для поиска','Заметный бюджет, нужна рабочая форма'],
+])}
+<p class="note">Опрос можно купить на панели: ${L('https://toolfox.ru/services/s/anketolog-panel','Анкетолог')} от 60 ₽ за анкету, то есть 50 анкет от 3000 ₽. Российского сервиса 5-секундных тестов агент не нашёл, но можно сделать свой таймер в прототипе и анкету.</p>
+<h3>Как внедрить</h3>
+<div class="card"><ol class="q">
+<li><b>Прототип.</b> Добавить варианты блока и переключатель A/B. Проверка смотрит каждый вариант, есть чистый режим для респондентов. Варианты только для 1–2 ключевых блоков.</li>
+<li><b>Правила маркетолога.</b> Сначала спросить трафик страницы и выбрать режим.</li>
+<li><b>Бой.</b> nginx отдаёт одну из двух сборок. Вариант пишется в журнал и скрытое поле формы, заявки считает сервер, поэтому учёт не зависит от отказов от cookie. Title, H1, разметку и смысл оставляем одинаковыми, чтобы ${L('https://yandex.ru/support/webmaster/ru/threat/cloaking','не попасть под клоакинг')}.</li>
+</ol></div>
+<h3>Что ещё не проверено</h3>
+<div class="card warn"><ul class="plain">
+<li>Можно ли грузить скрипт Varioqub до согласия на cookie: вопрос к юристу.</li>
+<li>Где Varioqub хранит данные и сколько стоит сейчас в рублях.</li>
+<li>Есть ли доступ к конфигу nginx на тарифах Beget.</li>
+<li>nginx-сплит и Varioqub на Astro живьём не запускали.</li>
+<li>Требования к хранению данных агент брал из ${L('https://habr.com/ru/articles/943422','статьи на Хабре')}, закон сам не читал.</li>
+</ul></div>
+`},
+];
+
+const tabs=document.getElementById('tabs'),main=document.getElementById('main');
+tabs.innerHTML=pages.map(p=>`<button role="tab" id="t-${p.id}" aria-controls="${p.id}" data-id="${p.id}">${p.name}</button>`).join('');
+main.innerHTML=pages.map(p=>`<section id="${p.id}" role="tabpanel" aria-labelledby="t-${p.id}" hidden>${p.html}</section>`).join('');
+
+function show(id,scroll){
+  if(!pages.some(p=>p.id===id))id='itog';
+  pages.forEach(p=>{
+    document.getElementById(p.id).hidden=p.id!==id;
+    document.getElementById('t-'+p.id).setAttribute('aria-selected',p.id===id);
+  });
+  const b=document.getElementById('t-'+id);
+  tabs.scrollTo({left:b.offsetLeft-tabs.offsetLeft-16});
+  if(scroll){const top=document.querySelector('nav').offsetTop;if(scrollY>top)scrollTo(0,top)}
+}
+tabs.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  history.replaceState(null,'','#'+b.dataset.id);show(b.dataset.id,true);
+});
+addEventListener('hashchange',()=>show(location.hash.slice(1),true));
+
+const themes=['Все',...new Set(fishki.map(f=>f[0]))],chips=document.getElementById('chips'),box=document.getElementById("fishki-list");
+function draw(th){
+  chips.innerHTML=themes.map(t=>`<button aria-pressed="${t===th}" data-t="${t}">${t}<small>${t==='Все'?fishki.length:fishki.filter(f=>f[0]===t).length}</small></button>`).join('');
+  box.innerHTML=T(['Тема','Фишка','Откуда'],fishki.filter(f=>th==='Все'||f[0]===th));
+}
+chips.addEventListener('click',e=>{const b=e.target.closest('button');if(b)draw(b.dataset.t)});
+draw('Все');
+show(location.hash.slice(1));
+</script>
+</body>
+</html>
