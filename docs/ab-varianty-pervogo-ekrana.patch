@@ -1,0 +1,232 @@
+diff --git a/prototip/proverka.mjs b/prototip/proverka.mjs
+index 340ec76..87d5da7 100644
+--- a/prototip/proverka.mjs
++++ b/prototip/proverka.mjs
+@@ -1,7 +1,7 @@
+ // Сборка:   node proverka.mjs sobrat <куда.html>   – шаблон с kit.css внутри (прототип – один файл)
+ // Проверка: node proverka.mjs <путь к prototip.html> [папка для снимков]
+ // Playwright берётся из первого найденного: node_modules рядом с прототипом, затем ~/Sites/*/node_modules/playwright.
+-// Меряет форму: прокрутка вбок на 390 и 1440, блоки без вопроса клиента, lorem/TODO, длинное тире, noindex, метки «запросить»,
++// Меряет форму: прокрутка вбок на 390 и 1440, блоки без вопроса клиента, цепочку вопросов (data-next), варианты первого экрана (.w-variant), lorem/TODO, длинное тире, noindex, метки «запросить»,
+ // текст после отправки у форм, вставки в сетке без дыр в ряду; ИНФО – блоки подряд без кнопки и блоки выше двух окон на 390.
+ // Убедителен ли прототип – решает владелец; проверка этого не ловит.
+ // Виджеты модуля tema-mail/vidzhety (.vz-root: окна, ярлычок, панели) – не часть вёрстки прототипа: в замерах не участвуют,
+@@ -38,7 +38,9 @@ const errors = [], info = [];
+ if (html.includes('—')) errors.push('длинное тире «—» в файле');
+ if (/lorem|ipsum|\bTODO\b/i.test(html)) errors.push('заглушки lorem/TODO – нужен реальный текст или метка «[запросить: …]»');
+ if (!/name="robots"[^>]*noindex/.test(html)) errors.push('нет <meta name="robots" content="noindex,nofollow">');
+-if ((html.match(/<h1[\s>]/g) || []).length !== 1) errors.push('H1 должен быть ровно один');
++const bezKomm = html.replace(/<!--[\s\S]*?-->/g, '');
++const chisloVariantov = (bezKomm.match(/class="[^"]*\bw-variant\b/g) || []).length;
++if ((bezKomm.match(/<h1[\s>]/g) || []).length !== Math.max(chisloVariantov, 1)) errors.push(chisloVariantov ? 'H1: по одному в каждом варианте первого экрана, вне вариантов H1 нет' : 'H1 должен быть ровно один');
+ // Заголовки-рубрики вместо смысла (карточка 39-pravil-teksta п.19; видео YAGLA v07, v19): точное совпадение – FAIL.
+ const RUBRIKI = ['отзывы', 'наши отзывы', 'наши преимущества', 'преимущества', 'почему мы', 'почему выбирают нас', 'о нас', 'о компании', 'наши услуги', 'услуги',
+   'как работаем', 'как мы работаем', 'частые вопросы', 'вопросы и ответы', 'faq', 'контакты', 'оставьте заявку', 'наши работы', 'портфолио', 'кейсы', 'каталог'];
+@@ -64,12 +66,24 @@ else {
+     if (!d.title || d.title.length > 65) errors.push(`title пустой или длиннее 65 знаков (${(d.title || '').length})`);
+     if (!d.description || d.description.length > 160) errors.push(`description пустой или длиннее 160 знаков (${(d.description || '').length})`);
+     if (/из SEO-задания/.test(d.title + d.description)) errors.push('в SEO-задании остались заглушки шаблона');
+-    const h1 = (html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/) || [])[1];
++    const h1 = (bezKomm.match(/<h1[^>]*>([\s\S]*?)<\/h1>/) || [])[1]; // при вариантах – первый, это вариант A
+     const clean = t => String(t || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+     if (d.h1 && h1 && clean(d.h1) !== clean(h1)) errors.push(`H1 на странице не совпадает с SEO-заданием: «${clean(h1)}» ≠ «${clean(d.h1)}»`);
+   } catch (e) { errors.push('SEO-задание (script#w-seo) не читается как JSON: ' + e.message); }
+ }
+ 
++// Первое окно: H1 и главная кнопка видимого варианта первого экрана видны без прокрутки (над липкой панелью на телефоне).
++const zamerPervogoOkna = () => {
++  const vidno = el => el.getBoundingClientRect().width > 0;
++  const sticky = [...document.querySelectorAll('.w-sticky, .vz-sticky')].find(el => getComputedStyle(el).display !== 'none') || null;
++  const limit = Math.round(innerHeight - (sticky ? sticky.getBoundingClientRect().height : 0));
++  const h1 = [...document.querySelectorAll('h1')].find(vidno) || null;
++  const hero = h1 ? h1.closest('.w-block') : null;
++  const knopki = hero ? [...hero.querySelectorAll('.w-btn:not(.ghost)')].filter(vidno) : [];
++  return { h1: h1 ? Math.round(h1.getBoundingClientRect().bottom) : null, cta: knopki.length ? Math.round(knopki[0].getBoundingClientRect().bottom) : null,
++    limit, mainButtons: knopki.length, scroll: document.documentElement.scrollWidth > document.documentElement.clientWidth };
++};
++
+ const pw = findPlaywright();
+ if (!pw) { errors.push('Playwright не найден – вёрстку на 390/1440 не проверить'); }
+ else {
+@@ -124,18 +138,30 @@ else {
+       const tall = blocks.filter(b => b.getBoundingClientRect().height > 2 * innerHeight)
+         .map(b => `${b.dataset.n || '?'} (${Math.round(b.getBoundingClientRect().height)} px)`);
+       const sticky = [...document.querySelectorAll('.w-sticky, .vz-sticky')].find(el => getComputedStyle(el).display !== 'none') || null;
+-      // Первое окно: H1 и главная кнопка первого экрана видны без прокрутки (над липкой панелью на телефоне).
+-      const bottomFree = innerHeight - (sticky && getComputedStyle(sticky).display !== 'none' ? sticky.getBoundingClientRect().height : 0);
+-      const h1 = document.querySelector('h1');
+-      const hero = h1 ? h1.closest('.w-block') : null;
+-      const cta = hero ? [...hero.querySelectorAll('.w-btn:not(.ghost)')].find(b => b.getBoundingClientRect().width > 0) : null;
+-      const firstWindow = {
+-        h1: h1 ? Math.round(h1.getBoundingClientRect().bottom) : null,
+-        cta: cta ? Math.round(cta.getBoundingClientRect().bottom) : null,
+-        limit: Math.round(bottomFree),
+-        mainButtons: hero ? hero.querySelectorAll('.w-btn:not(.ghost)').length : 0,
+-      };
+-      return { firstWindow, gridHoles, longest, tall,
++      // Цепочка: вопрос, который вызывает блок, дословно равен вопросу следующего блока (решение владельца 06.11.2026). Плашки призыва в цепочку не входят.
++      const norm = t => String(t || '').replace(/\s+/g, ' ').trim();
++      const chain = [...document.querySelectorAll('main .w-block:not(.w-cta-strip)')];
++      const svyazka = [];
++      chain.slice(0, -1).forEach((b, i) => {
++        const dalshe = norm(b.dataset.next), nado = norm(chain[i + 1].dataset.question), n = b.dataset.n || '?', sled = chain[i + 1].dataset.n || '?';
++        if (!dalshe) svyazka.push(`блок ${n}: нет data-next – какой вопрос он вызывает и как подводит к блоку ${sled}`);
++        else if (dalshe !== nado) svyazka.push(`блок ${n} ведёт к вопросу «${dalshe}», а блок ${sled} отвечает на «${nado}»`);
++      });
++      // Варианты: только первый экран, A и B, каждый из аудитории и исследования (решение владельца 06.11.2026).
++      const vs = [...document.querySelectorAll('.w-variant')], varianty = [];
++      if (vs.length) {
++        const pervyy = chain[0];
++        if (vs.some(v => !pervyy || !pervyy.contains(v))) varianty.push('варианты A/B только в первом экране (первый блок main)');
++        if (vs.map(v => v.dataset.v).join() !== 'A,B') varianty.push(`нужно ровно два варианта, A первым, сейчас: ${vs.map(v => v.dataset.v).join(', ')}`);
++        for (const v of vs) {
++          if (!norm(v.dataset.auditoriya)) varianty.push(`вариант ${v.dataset.v}: нет data-auditoriya – для какой аудитории и ситуации`);
++          if (!norm(v.dataset.issledovanie)) varianty.push(`вариант ${v.dataset.v}: нет data-issledovanie – какой вывод исследования за ним стоит`);
++          if (v.querySelectorAll('h1').length !== 1) varianty.push(`вариант ${v.dataset.v}: H1 должен быть ровно один`);
++        }
++        const tekst = v => { const c = v.cloneNode(true); c.querySelectorAll('.w-logic').forEach(x => x.remove()); return norm(c.textContent); };
++        if (vs.length === 2 && tekst(vs[0]) === tekst(vs[1])) varianty.push('варианты A и B совпадают по тексту');
++      }
++      return { svyazka, varianty, gridHoles, longest, tall,
+         scroll: de.scrollWidth > de.clientWidth, wide,
+         blocks: blocks.length,
+         noQuestion: blocks.filter(b => !b.dataset.question).map(b => b.dataset.n || '?'),
+@@ -146,12 +172,18 @@ else {
+         asks: document.querySelectorAll('.w-ask').length,
+       };
+     });
+-    const fw = r.firstWindow;
+-    if (fw.h1 !== null && fw.h1 > fw.limit) errors.push(`${w}px: H1 ниже первого окна (низ ${fw.h1} px при окне ${fw.limit})`);
+-    if (fw.cta === null) errors.push(`${w}px: в первом экране нет главной кнопки (.w-btn без ghost)`);
+-    else if (fw.cta > fw.limit) errors.push(`${w}px: главная кнопка ниже первого окна (низ ${fw.cta} px при окне ${fw.limit})`);
+-    if (w === 1440 && fw.mainButtons > 2) info.push(`первый экран: главных кнопок ${fw.mainButtons} – проверить перегруз`);
+-    await page.screenshot({ path: join(outDir, `pervoe-okno-${w}.png`) });
++    const spisokV = await page.evaluate(() => [...document.querySelectorAll('.w-variant')].map(v => v.dataset.v));
++    for (const v of spisokV.length ? spisokV : [null]) {
++      if (v) await page.evaluate(x => { document.body.dataset.v = x; }, v);
++      const fw = await page.evaluate(zamerPervogoOkna), gde = v ? `${w}px, вариант ${v}` : `${w}px`;
++      if (fw.h1 !== null && fw.h1 > fw.limit) errors.push(`${gde}: H1 ниже первого окна (низ ${fw.h1} px при окне ${fw.limit})`);
++      if (fw.cta === null) errors.push(`${gde}: в первом экране нет главной кнопки (.w-btn без ghost)`);
++      else if (fw.cta > fw.limit) errors.push(`${gde}: главная кнопка ниже первого окна (низ ${fw.cta} px при окне ${fw.limit})`);
++      if (v && v !== 'A' && fw.scroll) errors.push(`${gde}: прокрутка вбок`);
++      if (w === 1440 && fw.mainButtons > 2) info.push(`первый экран${v ? ', вариант ' + v : ''}: главных кнопок ${fw.mainButtons} – проверить перегруз`);
++      await page.screenshot({ path: join(outDir, `pervoe-okno-${w}${v ? '-' + v : ''}.png`) });
++    }
++    if (spisokV.length) await page.evaluate(() => { document.body.dataset.v = 'A'; });
+     if (r.scroll) errors.push(`${w}px: прокрутка вбок (${r.wide.join(', ') || 'источник не найден'})`);
+     if (jsErr.length) errors.push(`${w}px: ошибки скрипта: ${jsErr.join('; ')}`);
+     for (const g of r.gridHoles) errors.push(`${w}px: вставка в сетке рвёт ряд – ${g}; пустые ячейки (grid-auto-flow: dense или вставка после полного ряда)`);
+@@ -159,6 +191,8 @@ else {
+     if (w === 1440) {
+       info.push(`блоков: ${r.blocks}, форм: ${r.forms.length}, меток «запросить»: ${r.asks}`);
+       if (r.noQuestion.length) errors.push(`блоки без вопроса клиента: ${r.noQuestion.join(', ')}`);
++      for (const t of r.svyazka) errors.push('цепочка вопросов: ' + t);
++      for (const t of r.varianty) errors.push('варианты: ' + t);
+       if (r.noProof.length) errors.push(`блоки без опоры (data-proof): ${r.noProof.join(', ')}`);
+       if (r.emptyMedia) errors.push(`места под фото без роли: ${r.emptyMedia}`);
+       if (r.longest.length > 3) info.push(`внимание: блоков подряд без кнопки – ${r.longest.length} (блоки ${r.longest.join(', ')}); нужна ли плашка .w-cta-strip`);
+diff --git a/prototip/shablon.html b/prototip/shablon.html
+index 55057a2..f034680 100644
+--- a/prototip/shablon.html
++++ b/prototip/shablon.html
+@@ -7,6 +7,14 @@
+ <title>Прототип – НАЗВАНИЕ СТРАНИЦЫ</title>
+ <!-- kit.css вставляется целиком внутрь <style> (прототип – один файл, открывается без интернета) -->
+ <style>/*KIT*/</style>
++<!-- Варианты первого экрана: по умолчанию виден A, ?v=B или переключатель в служебной полосе показывает B. -->
++<style>
++.w-variant[data-v="B"] { display: none; }
++body[data-v="B"] .w-variant[data-v="A"] { display: none; }
++body[data-v="B"] .w-variant[data-v="B"] { display: block; }
++#w-ab button { min-height: 28px; padding: 0 10px; cursor: pointer; }
++body:not([data-v="B"]) #w-ab button[data-v="A"], body[data-v="B"] #w-ab button[data-v="B"] { font-weight: 700; text-decoration: underline; }
++</style>
+ <!-- Виджеты страницы (окна, ярлычок, боковая панель мессенджеров, нижняя панель телефона) – модуль tema-mail/vidzhety.
+      Набор под страницу – по справочнику ~/.claude/skills/marketolog/references/vidzhety-spravochnik.md. Чтобы включить – раскомментировать
+      это и блок «Виджеты: подключение» в конце страницы, положить рядом vidzhety-<страница>.json. Образец – ~/Sites/sayty-agent/prototipy/gaz-mag/.
+@@ -19,6 +27,7 @@ body.vz-has-sticky .w-sticky { display: none !important; }
+ </head>
+ <body>
+ <!-- Шаблон прототипа. Каждый блок – section.w-block с data-n, data-name, data-question, data-proof.
++     Блок отвечает на свой вопрос и подводит к следующему: data-next дословно равен data-question следующего блока (плашки .w-cta-strip вне цепочки, у последнего блока data-next нет).
+      Нет данных – <span class="w-ask">[запросить: что именно]</span>. Место под фото – .w-media с ролью.
+      Комментарий дизайнеру – <p class="w-note">…</p>. Тире только «–». Удалить ненужные блоки-примеры. -->
+ <div class="w-bar"><div class="w-wrap">
+@@ -27,6 +36,7 @@ body.vz-has-sticky .w-sticky { display: none !important; }
+   <label><input type="checkbox" id="t-notes"> Комментарии дизайнеру</label>
+   <label><input type="checkbox" id="t-seo"> SEO страницы</label>
+   <label><input type="checkbox" id="t-success"> После отправки</label>
++  <span id="w-ab" hidden>Первый экран: <button type="button" data-v="A">A</button> <button type="button" data-v="B">B</button></span>
+   <span>Меток «запросить»: <b id="ask-count">0</b></span>
+ </div></div>
+ 
+@@ -45,7 +55,9 @@ body.vz-has-sticky .w-sticky { display: none !important; }
+ </header>
+ 
+ <main>
+-  <section class="w-block" data-n="1" data-name="Первый экран" data-question="Куда я попал и решают ли здесь мою задачу?" data-proof="что подтверждает оффер">
++  <section class="w-block" data-n="1" data-name="Первый экран" data-question="Куда я попал и решают ли здесь мою задачу?" data-proof="что подтверждает оффер" data-next="Вопрос клиента">
++    <!-- A/B только здесь и только если аудитория и исследование дают разные углы: обернуть содержимое w-hero в два div.w-variant с data-v="A" и data-v="B"
++         (A первым), у каждого data-auditoriya (для кого, какая ситуация) и data-issledovanie (какой вывод стоит за вариантом), в каждом свой H1. Иначе один первый экран без обёртки. -->
+     <div class="w-wrap">
+       <div class="w-hero">
+         <div class="w-stack">
+@@ -61,7 +73,7 @@ body.vz-has-sticky .w-sticky { display: none !important; }
+     </div>
+   </section>
+ 
+-  <section class="w-block" data-n="2" data-name="Карточки" data-question="Вопрос клиента" data-proof="опора">
++  <section class="w-block" data-n="2" data-name="Карточки" data-question="Вопрос клиента" data-proof="опора" data-next="Что будет дальше?">
+     <div class="w-wrap w-stack">
+       <h2>H2 – смысл блока, а не рубрика</h2>
+       <div class="w-grid" style="--cols:3;--cols-m:2">
+@@ -72,7 +84,7 @@ body.vz-has-sticky .w-sticky { display: none !important; }
+     </div>
+   </section>
+ 
+-  <section class="w-block" data-n="3" data-name="Этапы" data-question="Что будет дальше?" data-proof="регламент работы">
++  <section class="w-block" data-n="3" data-name="Этапы" data-question="Что будет дальше?" data-proof="регламент работы" data-next="Что меня ещё останавливает?">
+     <div class="w-wrap w-stack"><h2>Как пройдёт работа – 4 шага от заявки до результата</h2>
+       <ol class="w-steps" style="--cols:4"><li><b>Шаг</b><span>Пояснение</span></li><li><b>Шаг</b><span>Пояснение</span></li><li><b>Шаг</b><span>Пояснение</span></li><li><b>Шаг</b><span>Пояснение</span></li></ol>
+     </div>
+@@ -83,7 +95,7 @@ body.vz-has-sticky .w-sticky { display: none !important; }
+     <div class="w-wrap"><div class="w-cta"><p>Предложение по блоку выше – лёгкий шаг</p><a class="w-btn" href="#zayavka">Действие плашки</a></div></div>
+   </section>
+ 
+-  <section class="w-block" data-n="4" data-name="Вопросы" data-question="Что меня ещё останавливает?" data-proof="вопросы из звонков и отзывов">
++  <section class="w-block" data-n="4" data-name="Вопросы" data-question="Что меня ещё останавливает?" data-proof="вопросы из звонков и отзывов" data-next="Как сделать первый шаг?">
+     <div class="w-wrap w-stack w-faq"><h2>Что спрашивают перед заказом</h2>
+       <details><summary>Вопрос</summary><p>Ответ</p></details>
+       <details><summary>Вопрос</summary><p>Ответ</p></details>
+@@ -122,7 +134,7 @@ body.vz-has-sticky .w-sticky { display: none !important; }
+ document.querySelectorAll('.w-block').forEach(function (b) {
+   var d = b.dataset, el = document.createElement('div');
+   el.className = 'w-logic';
+-  el.innerHTML = '<b>Блок ' + (d.n || '?') + ' · ' + (d.name || '') + '</b><br>Вопрос клиента: ' + (d.question || '–') + '<br>Опора: ' + (d.proof || '–');
++  el.innerHTML = '<b>Блок ' + (d.n || '?') + ' · ' + (d.name || '') + '</b><br>Вопрос клиента: ' + (d.question || '–') + '<br>Опора: ' + (d.proof || '–') + (d.next ? '<br>Дальше спросит: ' + d.next : '');
+   if (b.tagName === 'HEADER') b.prepend(el); else (b.querySelector('.w-wrap') || b).prepend(el);
+ });
+ document.getElementById('t-logic').addEventListener('change', function (e) { document.body.classList.toggle('show-logic', e.target.checked); });
+@@ -141,6 +153,22 @@ document.getElementById('t-success').addEventListener('change', function (e) { d
+     '</ul></td></tr><tr><td>разметка</td><td>' + esc(d.schema || '–') + '</td></tr><tr><td>ссылки</td><td><ul>' + (d.links || []).map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('') + '</ul></td></tr></table>';
+ })();
+ document.getElementById('ask-count').textContent = document.querySelectorAll('.w-ask').length;
++// Варианты первого экрана и чистый режим для респондентов (?chisto – без служебной полосы; ссылка на нужный вариант – ?v=B&chisto).
++(function () {
++  var q = new URLSearchParams(location.search), vs = document.querySelectorAll('.w-variant'), ab = document.getElementById('w-ab');
++  if (vs.length) {
++    document.body.dataset.v = q.get('v') === 'B' ? 'B' : 'A';
++    ab.hidden = false;
++    ab.addEventListener('click', function (e) { if (e.target.dataset.v) document.body.dataset.v = e.target.dataset.v; });
++    vs.forEach(function (v) {
++      var el = document.createElement('div');
++      el.className = 'w-logic';
++      el.textContent = 'Вариант ' + v.dataset.v + ' · для кого: ' + (v.dataset.auditoriya || '–') + ' · из исследования: ' + (v.dataset.issledovanie || '–');
++      v.prepend(el);
++    });
++  }
++  if (q.has('chisto')) document.querySelector('.w-bar').remove();
++})();
+ // Любая форма: галочка data-agree включает кнопку отправки своей формы.
+ document.querySelectorAll('form').forEach(function (f) {
+   var a = f.querySelector('[data-agree]'), btn = f.querySelector('button[type="submit"], button:not([type])');
